@@ -1,23 +1,21 @@
 #pragma once
 
-
 #include <string>
-#include <utility>
 #include <semaphore.h>
-#include <fcntl.h>
 
 class Fork{
-    std::string name;
+    std::string semName;
+    std::string shmName;
     sem_t *sem;
+    long *refCount;
 
 public:
-    Fork();
     explicit Fork(std::string name);
     Fork(const Fork &);
-    ~Fork() = default;
+    ~Fork();
     Fork& operator=(const Fork&) = default;
 
-    std::string getSemName();
-    sem_t *getSem();
+    void post();
+    void wait();
 };
 

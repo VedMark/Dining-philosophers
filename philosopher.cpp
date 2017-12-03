@@ -1,26 +1,20 @@
 #include <iostream>
 #include <random>
 #include <zconf.h>
+
 #include "philosopher.h"
 
-Philosopher::Philosopher(u_long _id, std::string _name, const Fork &_lFork, const Fork &_rFork) :
-        id(_id), name(std::move(_name)), lFork(_lFork), rFork(_rFork) {}
-
-Philosopher::Philosopher(const Philosopher &that) {
-    id = that.id;
-    name = that.name;
-    lFork = that.lFork;
-    rFork = that.rFork;
-}
+Philosopher::Philosopher(std::string _name, const std::string &_lForkName, const std::string &_rForkName) :
+        name(std::move(_name)), lFork(_lForkName), rFork(_rForkName) {}
 
 void Philosopher::exist() {
-    sem_wait(lFork.getSem());
-    sem_wait(rFork.getSem());
+    lFork.wait();
+    rFork.wait();
 
     eat();
 
-    sem_post(lFork.getSem());
-    sem_post(rFork.getSem());
+    lFork.post();
+    rFork.post();
 
     reflex();
 }

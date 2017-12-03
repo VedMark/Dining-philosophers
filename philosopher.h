@@ -3,14 +3,12 @@
 #include "fork.h"
 
 class Philosopher {
-    u_long id;
     std::string name;
     Fork lFork;
     Fork rFork;
 
 public:
-    explicit Philosopher(u_long id, std::string _name, const Fork &lFork, const Fork &rFork);
-    Philosopher(const Philosopher &that);
+    explicit Philosopher(std::string _name, const std::string &_lForkName, const std::string &_rForkName);
 
     void exist();
 

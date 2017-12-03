@@ -14,10 +14,7 @@ int main(int argc, char *argv[]) {
     fork_names[0] = getForkName(std::stoi(argv[1]));
     fork_names[1] = getForkName(std::stoi(argv[1]) + 1);
 
-    Fork lFork(fork_names[0]);
-    Fork rFork(fork_names[1]);
-
-    Philosopher philosopher(std::stoul(argv[1]), argv[2], lFork, rFork);
+    Philosopher philosopher(argv[2], fork_names[0], fork_names[1]);
     philosopher.exist();
 
     return 0;
