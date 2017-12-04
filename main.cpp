@@ -11,8 +11,10 @@ int main(int argc, char *argv[]) {
         return 1;
 
     std::string fork_names[2];
-    fork_names[0] = getForkName(std::stoi(argv[1]));
-    fork_names[1] = getForkName(std::stoi(argv[1]) + 1);
+    int proc_id = std::stoi(argv[1]);
+
+    fork_names[0] = getForkName(proc_id + proc_id % 2 ? 0 : 1);
+    fork_names[1] = getForkName(proc_id + proc_id % 2 ? 1 : 0);
 
     Philosopher philosopher(argv[2], fork_names[0], fork_names[1]);
     philosopher.exist();
