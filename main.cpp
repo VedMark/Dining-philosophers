@@ -24,8 +24,13 @@ int main(int argc, char *argv[]) {
 
     spdlog::set_pattern("[%Y-%m-%d %H:%M:%S:%e] [%l] %v");
 
-    Philosopher philosopher(argv[2], fork_names[0], fork_names[1], spdlog::stdout_logger_st("logger"));
-    philosopher.exist();
+    try {
+        Philosopher philosopher(argv[2], fork_names[0], fork_names[1], spdlog::stdout_logger_st("logger"));
+        philosopher.exist();
+    }
+    catch (Fork::FileObjectException) {
+        std::cerr << "Errors received while processing file objects" << std::endl;
+    }
 
     return 0;
 }

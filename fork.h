@@ -22,6 +22,9 @@ class Fork{
     Logger logger;
 
 public:
+    class FileObjectException{
+    };
+
     explicit Fork(const std::string &name, const std::string &owner, const Logger &logger);
     ~Fork();
 

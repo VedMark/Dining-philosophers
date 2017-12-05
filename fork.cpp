@@ -11,11 +11,30 @@
 Fork::Fork(const std::string &_name, const std::string &_owner, const Logger &_logger) :
         forkName(_name), shmName(_name + "_shm"), owner(_owner), logger(_logger) {
 
-    if(SEM_FAILED == (sem = sem_open(forkName.c_str(), O_CREAT, 0777, 1))) {
-        logger->error(strerror(errno));
-    }
+    try {
+        if(SEM_FAILED == (sem = sem_open(forkName.c_str(), O_CREAT, 0777, 1))) {
+            logger->error(strerror(errno));
+            throw FileObjectException();
+        }
 
-    initSharedMemory();
+        initSharedMemory();
+    }
+    catch (FileObjectException){
+        if(sharedData != (shared_data_t *) -1) {
+            pthread_mutex_lock(&sharedData->mutex);
+            sharedData->refCount -= 1;
+            pthread_mutex_unlock(&sharedData->mutex);
+
+            if(0 == sharedData->refCount) {
+                logger->info(owner + " destroyed " + forkName);
+                shm_unlink(shmName.c_str());
+                sem_unlink(forkName.c_str());
+            }
+        }
+
+        munmap(sharedData, sizeof(shared_data_t));
+        throw FileObjectException();
+    }
 }
 
 void Fork::initSharedMemory() {
@@ -25,6 +44,7 @@ void Fork::initSharedMemory() {
         if(EEXIST == errno) {
             if(-1 == (shm = shm_open(shmName.c_str(), O_CREAT | O_RDWR, 0777))) {
                 logger->error(strerror(errno));
+                throw FileObjectException();
             }
             mapSharedMemoryToProcessVirtualAddressSpace(shm);
 
@@ -52,6 +72,7 @@ void Fork::mapSharedMemoryToProcessVirtualAddressSpace(int shm) {
     sharedData = (shared_data_t *) mmap(nullptr, sizeof(long), PROT_WRITE | PROT_READ, MAP_SHARED, shm, 0);
     if (sharedData == (shared_data_t *) -1) {
         logger->error(strerror(errno));
+        throw FileObjectException();
     }
     close(shm);
 }
