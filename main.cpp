@@ -7,16 +7,24 @@ const int PROC_COUNT = 5;
 std::string getForkName(int proc_id);
 
 int main(int argc, char *argv[]) {
-    if(argc != 3)
+    if (argc != 3)
         return 1;
 
     std::string fork_names[2];
     int proc_id = std::stoi(argv[1]);
 
-    fork_names[0] = getForkName(proc_id + proc_id % 2 ? 0 : 1);
-    fork_names[1] = getForkName(proc_id + proc_id % 2 ? 1 : 0);
+    if (proc_id == 4) {
+        fork_names[0] = getForkName(proc_id + 1);
+        fork_names[1] = getForkName(proc_id);
+    }
+    else {
+        fork_names[0] = getForkName(proc_id);
+        fork_names[1] = getForkName(proc_id + 1);
+    }
 
-    Philosopher philosopher(argv[2], fork_names[0], fork_names[1]);
+    spdlog::set_pattern("[%Y-%m-%d %H:%M:%S:%e] [%l] %v");
+
+    Philosopher philosopher(argv[2], fork_names[0], fork_names[1], spdlog::stdout_logger_st("logger"));
     philosopher.exist();
 
     return 0;

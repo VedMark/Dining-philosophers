@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fork.h"
+#include <spdlog/spdlog.h>
 
 #define FOREVER_BEGIN for(;;) {
 #define FOREVER_END }
@@ -9,9 +10,10 @@ class Philosopher {
     std::string name;
     Fork lFork;
     Fork rFork;
+    Logger logger;
 
 public:
-    explicit Philosopher(std::string _name, const std::string &_lForkName, const std::string &_rForkName);
+    explicit Philosopher(char *_name, const std::string &_lForkName, const std::string &, const Logger &pLogger);
     ~Philosopher() = default;
 
     void exist();
@@ -19,6 +21,6 @@ public:
 private:
     void eat() const;
     void reflex() const ;
-    void takeTime() const ;
+    void takeTime(unsigned int begin, unsigned int end) const;
     unsigned getRandomUInt(unsigned begin, unsigned end) const;
 };

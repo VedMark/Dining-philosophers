@@ -2,16 +2,23 @@
 #include <random>
 #include <utility>
 #include <zconf.h>
+#include <spdlog/spdlog.h>
 
 #include "philosopher.h"
 
-Philosopher::Philosopher(std::string _name, const std::string &_lForkName, const std::string &_rForkName) :
-        name(std::move(_name)), lFork(_lForkName), rFork(_rForkName) {}
+Philosopher::Philosopher(char *_name, const std::string &_lForkName, const std::string &_rForkName, const Logger &pLogger)
+        :
+        name(_name),
+        logger(pLogger),
+        lFork(_lForkName, name, pLogger),
+        rFork(_rForkName, name, pLogger) {}
 
 void Philosopher::exist() {
     FOREVER_BEGIN
-        lFork.wait();
-        rFork.wait();
+        logger->info(name + " got hungry");
+
+        lFork.wait(std::time(nullptr));
+        rFork.wait(std::time(nullptr));
 
         eat();
 
@@ -21,29 +28,29 @@ void Philosopher::exist() {
         reflex();
 
         if(getRandomUInt(1, 5) == 5) {
-            exit(0);
+            break;
         }
     FOREVER_END
 }
 
 void Philosopher::eat() const{
-    std::cout << name << " started eating" << std::endl;
+    logger->info(name + " started eating");
 
-    takeTime();
+    takeTime(4, 8);
 
-    std::cout << name << " finished eating" << std::endl;
+    logger->info(name + " finished eating");
 }
 
 void Philosopher::reflex() const{
-    std::cout << name << " started reflexing" << std::endl;
+    logger->info(name + " started reflexing");
 
-    takeTime();
+    takeTime(1, 4);
 
-    std::cout << name << " finished reflexing" << std::endl;
+    logger->info(name + " finished reflexing");
 }
 
-void Philosopher::takeTime() const{
-    sleep(getRandomUInt(1, 5));
+void Philosopher::takeTime(unsigned begin, unsigned end) const{
+    sleep(getRandomUInt(begin, end));
 }
 
 unsigned Philosopher::getRandomUInt(unsigned begin, unsigned end) const{
