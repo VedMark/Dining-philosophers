@@ -4,12 +4,6 @@
 #include <semaphore.h>
 #include <spdlog/logger.h>
 
-struct  shared_data_t
-{
-    pthread_mutex_t mutex;
-    long refCount;
-};
-
 using Logger = std::shared_ptr<spdlog::logger>;
 
 
@@ -18,7 +12,6 @@ class Fork{
     std::string shmName;
     std::string owner;
     sem_t *sem;
-    shared_data_t *sharedData;
     Logger logger;
 
 public:
@@ -30,8 +23,4 @@ public:
 
     void post();
     void wait(std::time_t start_time);
-
-private:
-    void mapSharedMemoryToProcessVirtualAddressSpace(int shm);
-    void initSharedMemory();
 };
