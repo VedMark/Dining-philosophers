@@ -19,7 +19,7 @@ public:
     void exist();
 
 private:
-    void eat() const;
+    void eat();
     void reflex() const ;
     void takeTime(unsigned int begin, unsigned int end) const;
     unsigned getRandomUInt(unsigned begin, unsigned end) const;

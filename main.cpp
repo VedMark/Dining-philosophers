@@ -1,7 +1,7 @@
 #include <iostream>
 #include "philosopher.h"
 
-const char *SEM_NAME("/fork");
+const char *SEM_NAME("fork");
 const int PROC_COUNT = 5;
 
 std::string getForkName(int proc_id);
@@ -23,6 +23,7 @@ int main(int argc, char *argv[]) {
     }
 
     spdlog::set_pattern("[%Y-%m-%d %H:%M:%S:%e] [%l] %v");
+    spdlog::set_async_mode(8192);
 
     try {
         Philosopher philosopher(argv[2], fork_names[0], fork_names[1], spdlog::stdout_logger_st("logger"));

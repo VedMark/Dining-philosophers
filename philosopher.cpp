@@ -10,20 +10,20 @@ Philosopher::Philosopher(char *_name, const std::string &_lForkName, const std::
         :
         name(_name),
         logger(pLogger),
-        lFork(_lForkName, name, pLogger),
-        rFork(_rForkName, name, pLogger) {}
+        lFork(_lForkName, name),
+        rFork(_rForkName, name) {}
 
 void Philosopher::exist() {
     FOREVER_BEGIN
         logger->info(name + " got hungry");
 
-        lFork.wait(std::time(nullptr));
-        rFork.wait(std::time(nullptr));
+        lFork.take(std::time(nullptr));
+        rFork.take(std::time(nullptr));
 
         eat();
 
-        lFork.post();
-        rFork.post();
+        lFork.put();
+        rFork.put();
 
         reflex();
 
@@ -31,12 +31,15 @@ void Philosopher::exist() {
             break;
         }
     FOREVER_END
+    logger->info(name + " end up with existing");
 }
 
-void Philosopher::eat() const{
+void Philosopher::eat() {
     logger->info(name + " started eating");
 
-    takeTime(4, 8);
+    lFork.logEating();
+    rFork.logEating();
+    takeTime(1, 4);
 
     logger->info(name + " finished eating");
 }
