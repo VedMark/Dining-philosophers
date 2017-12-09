@@ -4,6 +4,8 @@
 #include <cstring>
 #include <sstream>
 #include <iomanip>
+#include <chrono>
+#include <ios>
 
 #include "fork.h"
 
@@ -13,10 +15,9 @@ Fork::Fork(const std::string &_name, const std::string &_owner) :
         forkName(_name), owner(_owner) {
 
     if (SEM_FAILED == (sem = sem_open(SEMAPHORE_NAME(forkName).c_str(), O_CREAT, 0777, 1))) {
-        logger->error(strerror(errno));
+        log(strerror(errno));
         throw FileObjectException();
     }
-    logger = spdlog::rotating_logger_st(forkName +"_logger", "logs/" + forkName, 1024 * 1024 * 16, 0);
 }
 
 Fork::~Fork() {
@@ -24,17 +25,31 @@ Fork::~Fork() {
 }
 
 void Fork::put() {
-    logger->info(owner + " put " + forkName);
+    log(owner + " put " + forkName);
     sem_post(sem);
 }
 
 void Fork::take(std::time_t start_time) {
     sem_wait(sem);
     auto end_time = std::time(nullptr);
-    logger->info(owner + " took " + forkName + " after " + std::to_string(end_time - start_time) + "s of waiting");
+    auto message = owner + " took " + forkName + " after " + std::to_string(end_time - start_time) + "s of waiting";
+    log(message);
+}
+
+void Fork::log(std::string message) {
+    resource.open("logs/" + forkName + ".log", std::fstream::app);
+    resource << "[" << getCurrentTime() << "] " << message << std::endl;
+    resource.close();
 }
 
 void Fork::logEating() {
-    logger->info(owner + " started eating");
+    log(owner + " started eating");
+}
+
+std::string Fork::getCurrentTime() {
+    auto time = std::chrono::system_clock::now();
+    auto t = std::chrono::system_clock::to_time_t(time);
+    auto str = std::string(std::ctime(&t));
+    return str.substr(0, str.length() - 1);
 }
 

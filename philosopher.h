@@ -3,6 +3,8 @@
 #include "fork.h"
 #include <spdlog/spdlog.h>
 
+using Logger = std::shared_ptr<spdlog::logger>;
+
 #define FOREVER_BEGIN for(;;) {
 #define FOREVER_END }
 

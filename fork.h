@@ -2,16 +2,16 @@
 
 #include <string>
 #include <semaphore.h>
-#include <spdlog/spdlog.h>
-
-using Logger = std::shared_ptr<spdlog::logger>;
+#include <fstream>
+#include <spdlog/logger.h>
+#include <time.h>
 
 
 class Fork{
     std::string forkName;
     std::string owner;
     sem_t *sem;
-    Logger logger;
+    std::ofstream resource;
 
 public:
     class FileObjectException{
@@ -23,4 +23,8 @@ public:
     void put();
     void take(std::time_t start_time);
     void logEating();
+
+private:
+    void log(std::string message);
+    std::string getCurrentTime();
 };
